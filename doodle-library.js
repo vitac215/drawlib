@@ -17,8 +17,16 @@ function Doodle (context) {
 }
 
 Doodle.prototype.draw = function() {
- 	// Your draw code here
+ 	// draw all children
+    for (var i = 0; i < this.children.length; i++) {
+        // only draw if the children are visible
+        if (this.children[i].visible == true) {
+            this.children[i].draw(this.context);
+        };
+    };
 };
+
+
 
 /* Base class for all drawable objects.
  * Do not modify this class!
@@ -64,6 +72,8 @@ Drawable.prototype.draw = function(context) {
 };
 
 
+
+
 /* Base class for objects that cannot contain child objects.
  * Do not modify this class!
  */
@@ -78,6 +88,8 @@ function Primitive(attrs) {
     this.color = attrs.color;
 }
 Primitive.inheritsFrom(Drawable);
+
+
 
 function Text(attrs) {
     var dflt = {
@@ -95,6 +107,19 @@ function Text(attrs) {
 Text.inheritsFrom(Drawable);
 
 //Text methods here
+Text.prototype.draw = function(context) {
+ 
+}
+
+Text.prototype.getWidth = function(context) {
+
+}
+
+Text.prototype.getHeight = function(context) {
+    
+}
+
+
 
 function DoodleImage(attrs) {
     var dflt = {
@@ -110,6 +135,19 @@ function DoodleImage(attrs) {
 DoodleImage.inheritsFrom(Drawable);
 
 //DoodleImage methods here
+DoodleImage.prototype.draw = function(context) {
+
+}
+
+DoodleImage.prototype.getWidth = function(context) {
+    
+}
+
+DoodleImage.prototype.getHeight = function(context) {
+    
+}
+
+
 
 function Line(attrs) {
     var dflt = {
@@ -125,6 +163,19 @@ function Line(attrs) {
 Line.inheritsFrom(Primitive);
 
 //Line methods here
+Line.prototype.draw = function(context) {
+    
+}
+
+Line.prototype.getWidth = function(context) {
+    
+}
+
+Line.prototype.getHeight = function(context) {
+    
+}
+
+
 
 function Rectangle(attrs) {
     var dflt = {
@@ -140,6 +191,19 @@ function Rectangle(attrs) {
 Rectangle.inheritsFrom(Primitive);
 
 //Rectangle Methods here
+Rectangle.prototype.draw = function(context) {
+    
+}
+
+Rectangle.prototype.getWidth = function(context) {
+    
+}
+
+Rectangle.prototype.getHeight = function(context) {
+    
+}
+
+
 
 function Container(attrs) {
     var dflt = {
@@ -156,6 +220,23 @@ function Container(attrs) {
 Container.inheritsFrom(Drawable);
 
 //Rest of container methods here
+Container.prototype.draw = function(context) {
+    
+}
+
+Container.prototype.layout = function(context) {
+    
+}
+
+Container.prototype.getWidth = function(context) {
+    
+}
+
+Container.prototype.getHeight = function(context) {
+    
+}
+
+
 
 function Pile(attrs) {
   Container.call(this, attrs);   
@@ -164,6 +245,24 @@ function Pile(attrs) {
 Pile.inheritsFrom(Container);
 
 //Rest of pile methods here
+Pile.prototype.draw = function(context) {
+    
+}
+
+Pile.prototype.layout = function(context) {
+    
+}
+
+Pile.prototype.getWidth = function(context) {
+    
+}
+
+Pile.prototype.getHeight = function(context) {
+    
+}
+
+
+
 
 function Row(attrs) {
   Container.call(this, attrs);    
@@ -172,6 +271,23 @@ function Row(attrs) {
 Row.inheritsFrom(Container);
 
 //Rest of row methods here
+Row.prototype.draw = function(context) {
+    
+}
+
+Row.prototype.layout = function(context) {
+    
+}
+
+Row.prototype.getWidth = function(context) {
+    
+}
+
+Row.prototype.getHeight = function(context) {
+    
+}
+
+
 
 function Column(attrs) {
   Container.call(this, attrs);  
@@ -180,6 +296,23 @@ function Column(attrs) {
 Column.inheritsFrom(Container);
 
 //Rest of column methods here
+Column.prototype.draw = function(context) {
+    
+}
+
+Column.prototype.layout = function(context) {
+    
+}
+
+Column.prototype.getWidth = function(context) {
+    
+}
+
+Column.prototype.getHeight = function(context) {
+    
+}
+
+
 
 function Circle(attrs) {
   Container.call(this, attrs);      
@@ -194,6 +327,23 @@ function Circle(attrs) {
 Circle.inheritsFrom(Container);
 
 //Rest of circle methods here
+Circle.prototype.draw = function(context) {
+    
+}
+
+Circle.prototype.layout = function(context) {
+    
+}
+
+Circle.prototype.getWidth = function(context) {
+    
+}
+
+Circle.prototype.getHeight = function(context) {
+    
+}
+
+
 
 function OvalClip(attrs) {
   Container.call(this, attrs);
@@ -202,6 +352,23 @@ function OvalClip(attrs) {
 OvalClip.inheritsFrom(Container);
 
 //Rest of ovalClip methods here
+OvalClip.prototype.draw = function(context) {
+    
+}
+
+OvalClip.prototype.layout = function(context) {
+    
+}
+
+OvalClip.prototype.getWidth = function(context) {
+    
+}
+
+OvalClip.prototype.getHeight = function(context) {
+    
+}
+
+
 
 /**
  * Measurement function to measure canvas fonts

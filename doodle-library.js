@@ -1,5 +1,7 @@
 // Things to check:
-//   text fillText(last param)
+//   text    fillText(last param)
+//   rect    context.beginpath()
+//   img     context.save()
 
 /* Doodle Drawing Library
  *
@@ -52,7 +54,7 @@ function Drawable (attrs) {
     this.visible = attrs.visible;
     this.theta = attrs.theta*Math.PI/180;
     this.scale = attrs.scale;
-}
+};
 
 /*
  * Summary: returns the calculated width of this object
@@ -60,7 +62,7 @@ function Drawable (attrs) {
 Drawable.prototype.getWidth = function(context) {
   console.log("ERROR: Calling unimplemented draw method on drawable object.");
   return 0;
-}
+};
 
 /*
  * Summary: returns the calculated height of this object
@@ -68,7 +70,7 @@ Drawable.prototype.getWidth = function(context) {
 Drawable.prototype.getHeight = function(context) {
   console.log("ERROR: Calling unimplemented draw method on drawable object.");
   return 0;
-}
+};
 
 /*
  * Summary: Uses the passed in context object (passed in by a doodle object)
@@ -93,7 +95,7 @@ function Primitive(attrs) {
     Drawable.call(this, attrs);
     this.lineWidth = attrs.lineWidth;
     this.color = attrs.color;
-}
+};
 Primitive.inheritsFrom(Drawable);
 
 
@@ -115,7 +117,7 @@ function Text(attrs) {
     this.font = attrs.font;
     this.size = attrs.size;
     this.bold = attrs.bold;
-}
+};
 Text.inheritsFrom(Drawable);
 
 //Text methods here
@@ -126,6 +128,7 @@ Text.prototype.draw = function(context) {
     // apply translation ,rotation, or scale if necessary
     applyTRS(context, this, this.left, this.top, this.theta, this.scale);
 
+    context.beginPath();
     // if the text is bold
     if (this.bold) {
         context.font = "bold "+this.size+"pt "+this.font;
@@ -134,7 +137,8 @@ Text.prototype.draw = function(context) {
         context.font = this.size+"pt "+this.font;
     }
     context.fillStyle = this.fill; 
-    context.fillText(this.content, 0, this.getHeight());
+    context.fillText(this.content, 0, 0);
+    context.closePath();
 
     console.log(this);  
 };
@@ -161,21 +165,51 @@ function DoodleImage(attrs) {
     Drawable.call(this, attrs);
  
     //Rest of constructor code here
-}
+    this.width = attrs.width;
+    this.height = attrs.height;
+    this.src = attrs.src;
+};
 DoodleImage.inheritsFrom(Drawable);
 
 //DoodleImage methods here
 DoodleImage.prototype.draw = function(context) {
+    console.log(this); 
+    // create a new image object
+    var img = new Image();
+    img.src = this.src;
+    img.left = this.left;
+    img.top = this.top;
+    img.theta = this.theta;
+    img.scale = this.scale;
+    img.width = this.width;
+    img.height = this.height;
 
-}
+    // make sure the image is loaded before drawing
+    img.onload = function() {
+        context.save();  //  question: why this is needed ... already call that in drawable.draw
+        // apply translation ,rotation, or scale if necessary
+        applyTRS(context, img, img.left, img.top, img.theta, img.scale); 
+
+        context.beginPath();
+        // If the width and height of the image are not specified (i.e. default to -1)
+        if (img.width == -1 && img.height == -1) {
+            context.drawImage(img, 0, 0);
+        }
+        else {
+            context.drawImage(img, 0, 0, img.width, img.height);   
+        }
+        context.closePath();   
+        context.restore();
+    };
+};
 
 DoodleImage.prototype.getWidth = function(context) {
-    
-}
+    return this.width;
+};
 
 DoodleImage.prototype.getHeight = function(context) {
-    
-}
+    return this.height;
+};
 
 
 
@@ -193,7 +227,7 @@ function Line(attrs) {
     this.startY = attrs.startY;
     this.endX = attrs.endX;
     this.endY = attrs.endY;
-}
+};
 Line.inheritsFrom(Primitive);
 
 //Line methods here
@@ -201,7 +235,7 @@ Line.prototype.draw = function(context) {
     // apply translation ,rotation, or scale if necessary
     applyTRS(context, this, this.left, this.top, this.theta, this.scale);
 
-    context.beginPath();
+    context.beginPath();  
     // set the line width and line color
     context.lineWidth = this.lineWidth;
     context.strokeStyle = this.color;
@@ -238,30 +272,33 @@ function Rectangle(attrs) {
     this.y = attrs.y;
     this.width = attrs.width;
     this.height = attrs.height;
-}
+};
 Rectangle.inheritsFrom(Primitive);
 
 //Rectangle Methods here
 Rectangle.prototype.draw = function(context) {
     // apply translation ,rotation, or scale if necessary
     applyTRS(context, this, this.left, this.top, this.theta, this.scale);
+
     // create the rectangle
+    context.beginPath();   // question: weird thing happens if this is commented out
     context.rect(this.x, this.y, this.width, this.height);
     // set line width and strokeStyle
     context.lineWidth = this.lineWidth;
     context.strokeStyle = this.color;
     // draw the rectangle
     context.stroke();
+    context.closePath(); 
 
     console.log(this);
 };
 
 Rectangle.prototype.getWidth = function(context) {
-    
+    return this.width;
 };
 
 Rectangle.prototype.getHeight = function(context) {
-    
+    return this.height;
 };
 
 
@@ -277,50 +314,50 @@ function Container(attrs) {
     attrs = mergeWithDefault(attrs, dflt);
     Drawable.call(this, attrs);    
     //Rest of constructor code here
-}
+};
 Container.inheritsFrom(Drawable);
 
 //Rest of container methods here
 Container.prototype.draw = function(context) {
     
-}
+};
 
 Container.prototype.layout = function(context) {
     
-}
+};
 
 Container.prototype.getWidth = function(context) {
     
-}
+};
 
 Container.prototype.getHeight = function(context) {
     
-}
+};
 
 
 
 function Pile(attrs) {
   Container.call(this, attrs);   
   //Rest of constructor code here
-}
+};
 Pile.inheritsFrom(Container);
 
 //Rest of pile methods here
 Pile.prototype.draw = function(context) {
     
-}
+};
 
 Pile.prototype.layout = function(context) {
     
-}
+};
 
 Pile.prototype.getWidth = function(context) {
     
-}
+};
 
 Pile.prototype.getHeight = function(context) {
     
-}
+};
 
 
 
@@ -328,50 +365,50 @@ Pile.prototype.getHeight = function(context) {
 function Row(attrs) {
   Container.call(this, attrs);    
   //Rest of constructor code here
-}
+};
 Row.inheritsFrom(Container);
 
 //Rest of row methods here
 Row.prototype.draw = function(context) {
     
-}
+};
 
 Row.prototype.layout = function(context) {
     
-}
+};
 
 Row.prototype.getWidth = function(context) {
     
-}
+};
 
 Row.prototype.getHeight = function(context) {
     
-}
+};
 
 
 
 function Column(attrs) {
   Container.call(this, attrs);  
   //Rest of constructor code here
-}
+};
 Column.inheritsFrom(Container);
 
 //Rest of column methods here
 Column.prototype.draw = function(context) {
     
-}
+};
 
 Column.prototype.layout = function(context) {
     
-}
+};
 
 Column.prototype.getWidth = function(context) {
     
-}
+};
 
 Column.prototype.getHeight = function(context) {
     
-}
+};
 
 
 
@@ -384,21 +421,21 @@ function Circle(attrs) {
   };
   attrs = mergeWithDefault(attrs, dflt);
   //Rest of constructor code here
-}
+};
 Circle.inheritsFrom(Container);
 
 //Rest of circle methods here
 Circle.prototype.draw = function(context) {
     
-}
+};
 
 Circle.prototype.layout = function(context) {
     
-}
+};
 
 Circle.prototype.getWidth = function(context) {
     
-}
+};
 
 Circle.prototype.getHeight = function(context) {
     
@@ -409,25 +446,25 @@ Circle.prototype.getHeight = function(context) {
 function OvalClip(attrs) {
   Container.call(this, attrs);
   //Rest of constructor code here
-}
+};
 OvalClip.inheritsFrom(Container);
 
 //Rest of ovalClip methods here
 OvalClip.prototype.draw = function(context) {
     
-}
+};
 
 OvalClip.prototype.layout = function(context) {
     
-}
+};
 
 OvalClip.prototype.getWidth = function(context) {
     
-}
+};
 
 OvalClip.prototype.getHeight = function(context) {
     
-}
+};
 
 
 
@@ -466,7 +503,7 @@ function MeasureText(text, bold, font, size)
     __measuretext_cache__[str] = size;
     
     return size;
-}
+};
 
 /**
  * Apply translation, rotation, or scale to an object if necessary
@@ -477,4 +514,4 @@ function applyTRS(context, thisObj, left, top, theta, scale) {
     context.translate(thisObj.left, thisObj.top);
     context.rotate(thisObj.theta);
     context.scale(thisObj.scale, thisObj.scale);
-}
+};

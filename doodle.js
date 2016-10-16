@@ -179,8 +179,8 @@ window.onload = function () {
 	    	snowflake_container.children.push(snowflake);
 	    }  
 	    
-	    // Draw
 	    root.children.push(snowflake_container);
+        // Draw
 	    root.draw();
     }
 

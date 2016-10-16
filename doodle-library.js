@@ -1,5 +1,4 @@
 // Things to check:
-//   text    fillText(last param: getHeight())
 //   rect    context.beginpath()
 
 /* Doodle Drawing Library
@@ -22,12 +21,12 @@ function Doodle (context) {
 
 // Variables to record the number of images and the number of images loaded
 var images = 0;
-var imagesLoad = 0;
+var imagesLoaded = 0;
 
 Doodle.prototype.draw = function() {
     var doodle = this;
     // Check if all images are loaded
-    if (images == imagesLoad) {
+    if (images == imagesLoaded) {
         // Draw all children
         for (var i = 0; i < this.children.length; i++) {
             // only draw if the children are visible
@@ -41,8 +40,8 @@ Doodle.prototype.draw = function() {
     else {
         setTimeout(function(){
             // Try drawing again
-            doodle.draw(doodle.context);    // why this.draw() doesn't work
-        }, 100);
+            doodle.draw(doodle.context);    // question: why this.draw() doesn't work
+        }, 200);
     }
 
 };
@@ -94,7 +93,6 @@ Drawable.prototype.draw = function(context) {
 
 
 
-
 /* Base class for objects that cannot contain child objects.
  * Do not modify this class!
  */
@@ -112,6 +110,9 @@ Primitive.inheritsFrom(Drawable);
 
 
 
+/*
+ * Text class (Primitive)
+ */
 function Text(attrs) {
     var dflt = {
         content: "",
@@ -165,6 +166,9 @@ Text.prototype.getHeight = function(context) {
 
 
 
+/*
+ * DoodleImage class (Primitive)
+ */
 function DoodleImage(attrs) {
     var dflt = {
         width: -1,
@@ -183,9 +187,9 @@ function DoodleImage(attrs) {
 
     // Load all images before the whole drawing
     images++;
-    // Add 1 to imagesLoad when a image is loaded
+    // Add 1 to imagesLoaded when a image is loaded
     this.img.onload = function() {
-        imagesLoad++;
+        imagesLoaded++;
     }
 
 };
@@ -221,6 +225,9 @@ DoodleImage.prototype.getHeight = function(context) {
 
 
 
+/*
+ * Line class (Primitive)
+ */
 function Line(attrs) {
     var dflt = {
         startX: 0,
@@ -266,6 +273,9 @@ Line.prototype.getHeight = function(context) {
 
 
 
+/*
+ * Rectangle class (Primitive)
+ */
 function Rectangle(attrs) {
     var dflt = {
         x: 0,
@@ -310,6 +320,9 @@ Rectangle.prototype.getHeight = function(context) {
 
 
 
+/*
+ * Container base class
+ */
 function Container(attrs) {
     var dflt = {
         width: 100,
@@ -392,6 +405,9 @@ Container.prototype.getHeight = function(context) {
 
 
 
+/*
+ * Pile class (Container)
+ */
 function Pile(attrs) {
   Container.call(this, attrs);   
   //Rest of constructor code here
@@ -467,6 +483,9 @@ Pile.prototype.getHeight = function(context) {
 
 
 
+/*
+ * Row class (Container)
+ */
 function Row(attrs) {
   Container.call(this, attrs);    
   //Rest of constructor code here
@@ -551,6 +570,9 @@ Row.prototype.getHeight = function(context) {
 
 
 
+/*
+ * Column class (Container)
+ */
 function Column(attrs) {
   Container.call(this, attrs);  
   //Rest of constructor code here
@@ -633,6 +655,9 @@ Column.prototype.getHeight = function(context) {
 
 
 
+/*
+ * Circle class (Container)
+ */
 function Circle(attrs) {
   Container.call(this, attrs);      
   var dflt = {
@@ -716,6 +741,9 @@ Circle.prototype.getHeight = function(context) {
 
 
 
+/*
+ * Oval clip class (Container)
+ */
 function OvalClip(attrs) {
   Container.call(this, attrs);
   //Rest of constructor code here

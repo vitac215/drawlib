@@ -773,7 +773,7 @@ OvalClip.prototype.draw = function(context) {
 };
 
 OvalClip.prototype.layout = function(context) {
-    
+    // no change to the children's layout
 };
 
 OvalClip.prototype.getWidth = function(context) {

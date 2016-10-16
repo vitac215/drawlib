@@ -20,8 +20,8 @@ window.onload = function () {
     	height: 600,
     	left: 260,
     	top: 200,
-    	borderWidth: 1,
-    	borderColor: "black"
+    	borderWidth: 0,
+    	borderColor: ""
     });
 
     // Container for snow man's hands
@@ -30,8 +30,8 @@ window.onload = function () {
     	height: 600,
     	left: 260,
     	top: 200,
-    	borderWidth: 1,
-    	borderColor: "green"
+    	borderWidth: 0,
+    	borderColor: ""
     });
 
     // Snow man
@@ -39,13 +39,13 @@ window.onload = function () {
     	var snowman_head = new OvalClip({
     		width: 200,
     		height: 180,
-    		borderWidth: 1,
+    		borderWidth: 0,
     		fill: "white",
     	});
     	var snowman_body = new OvalClip({
     		width: 300,
     		height: 260,
-    		borderWidth: 1,
+    		borderWidth: 0,
     		fill: "white"
     	});
     	var snowman_eye1 = new Circle({
@@ -91,7 +91,7 @@ window.onload = function () {
     		startY: 170,
     		endX: 150,
     		endY: 240,
-    		color: "green",
+    		color: "#4a3621",
     		lineWidth: 3
     	});
     	var snowman_hand2 = new Line({
@@ -99,7 +99,7 @@ window.onload = function () {
     		startY: 170,
     		endX: 350,
     		endY: 240,
-    		color: "red",
+    		color: "#4a3621",
     		lineWidth: 3
     	});
 
@@ -113,24 +113,22 @@ window.onload = function () {
 		width: 100,
 		height: 100,
 		left: 510,
-		top: 380,
+		top: 400,
 		borderWidth: 0,
 		layoutCenterX: 0,
 		layoutCenterY: 0,
-		layoutRadius: 350   	
+		layoutRadius: 330   	
     });
 
     // Images of snowflakes
     for (var i = 0; i < 10; i++) {
     	var snowflake = new DoodleImage({
-    		src: "images/snowflake.png",
+    		src: "images/snowflake_white.png",
     		width: 80,
     		height: 80
     	})
     	snowflake_container.children.push(snowflake);
     }
-
-
 
     background.children.push(column, container1)
 

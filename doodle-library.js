@@ -1,5 +1,5 @@
 // Things to check:
-//   text    fillText(last param)
+//   text    fillText(last param: getHeight())
 //   rect    context.beginpath()
 
 /* Doodle Drawing Library

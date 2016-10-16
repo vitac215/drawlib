@@ -25,7 +25,7 @@ var images = 0;
 var imagesLoad = 0;
 
 Doodle.prototype.draw = function() {
-    var self = this;
+    var doodle = this;
     // check if all images are loaded
     if (images == imagesLoad) {
         // draw all children
@@ -41,7 +41,7 @@ Doodle.prototype.draw = function() {
     else {
         setTimeout(function(){
             // try drawing again
-            self.draw(self.context);    // why this.draw() doesn't work
+            doodle.draw(doodle.context);    // why this.draw() doesn't work
         }, 100);
     }
 
@@ -353,7 +353,7 @@ Container.prototype.draw = function(context) {
     // set line width and strokeStyle
     // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
     // so, only draw the path if the container's borderWidth has a value
-    if (this.borderWidth) {
+    if (this.borderWidth > 0) {
         context.lineWidth = this.borderWidth;
         context.strokeStyle = this.borderColor;       
         // draw the container path
@@ -421,7 +421,7 @@ Pile.prototype.draw = function(context) {
     // set line width and strokeStyle
     // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
     // so, only draw the path if the container's borderWidth has a value
-    if (this.borderWidth) {
+    if (this.borderWidth > 0) {
         context.lineWidth = this.borderWidth;
         context.strokeStyle = this.borderColor;       
         // draw the container path
@@ -455,7 +455,6 @@ Pile.prototype.draw = function(context) {
 Pile.prototype.layout = function(context) {
     // place all the children at its own top-left corner
     for (var i = 0; i < this.children.length; i++) {
-        // only draw if the children are visible
         if (this.children[i].visible == true) {
             this.children[i].top = 0;
             this.children[i].left = 0;
@@ -497,7 +496,7 @@ Row.prototype.draw = function(context) {
     // set line width and strokeStyle
     // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
     // so, only draw the path if the container's borderWidth has a value
-    if (this.borderWidth) {
+    if (this.borderWidth > 0) {
         context.lineWidth = this.borderWidth;
         context.strokeStyle = this.borderColor;       
         // draw the container path
@@ -531,8 +530,18 @@ Row.prototype.draw = function(context) {
 Row.prototype.layout = function(context) {
     // place all the children in a single horizontal row with the children vertically centered
     var center = this.getHeight()/2;
-    console.log("center: "+center);
+    var left = 0;
 
+    for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i].visible == true) {
+            console.log("left: "+left);
+            // make the child vertically centered
+            this.children[i].top = center - this.children[i].getHeight()/2;
+            // place the child in a single horizontal row
+            this.children[i].left = left;
+            left += this.children[i].getWidth() + this.children[i].borderWidth;
+        };
+    };
 };
 
 Row.prototype.getWidth = function(context) {
@@ -553,19 +562,75 @@ Column.inheritsFrom(Container);
 
 //Rest of column methods here
 Column.prototype.draw = function(context) {
-    
+    console.log(this);
+
+    context.save();
+
+    // apply translation ,rotation, or scale if necessary
+    applyTRS(context, this, this.left, this.top, this.theta, this.scale);
+
+    // create the container path
+    context.beginPath();
+    context.rect(0, 0, this.width, this.height);
+    context.closePath();
+
+    // set line width and strokeStyle
+    // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
+    // so, only draw the path if the container's borderWidth has a value
+    if (this.borderWidth > 0) {
+        context.lineWidth = this.borderWidth;
+        context.strokeStyle = this.borderColor;       
+        // draw the container path
+        context.stroke();
+    };
+
+    // fill the container
+    if (this.fill != false) {   // false = "black"
+        context.fillStyle = this.fill;
+        context.fill();
+    };
+
+    // make a clip and draw the children in the container
+    context.clip();
+
+    this.layout(context);
+
+    // draw the children
+    for (var i = 0; i < this.children.length; i++) {
+        // only draw if the children are visible
+        if (this.children[i].visible == true) {
+            context.save();
+            this.children[i].draw(context);
+            context.restore();
+        };
+    };
+
+    context.restore();   
 };
 
 Column.prototype.layout = function(context) {
-    
+    // place all the children in a single vertical column with the children horizontally centered
+    var center = this.getWidth()/2;
+    var top = 0;
+
+    for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i].visible == true) {
+            console.log("top: "+top);
+            // make the child vertically centered
+            this.children[i].left = center - this.children[i].getWidth()/2;
+            // place the child in a single horizontal row
+            this.children[i].top = top;
+            top += this.children[i].getHeight() + this.children[i].borderWidth;
+        };
+    }; 
 };
 
 Column.prototype.getWidth = function(context) {
-    
+    return this.width;
 };
 
 Column.prototype.getHeight = function(context) {
-    
+    return this.height;
 };
 
 
@@ -579,24 +644,76 @@ function Circle(attrs) {
   };
   attrs = mergeWithDefault(attrs, dflt);
   //Rest of constructor code here
+  this.layoutCenterX = attrs.layoutCenterX;
+  this.layoutCenterY = attrs.layoutCenterY;
+  this.layoutRadius = attrs.layoutRadius;
 };
 Circle.inheritsFrom(Container);
 
 //Rest of circle methods here
 Circle.prototype.draw = function(context) {
-    
+    console.log(this);
+
+    context.save();
+
+    // apply translation ,rotation, or scale if necessary
+    applyTRS(context, this, this.left, this.top, this.theta, this.scale);
+
+    // create the container path
+    context.beginPath();
+    context.arc(this.layoutCenterX, this.layoutCenterY, this.layoutRadius, 0, 2*Math.PI);
+    context.closePath();
+
+    // set line width and strokeStyle
+    // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
+    // so, only draw the path if the container's borderWidth has a value
+    if (this.borderWidth > 0) {
+        context.lineWidth = this.borderWidth;
+        context.strokeStyle = this.borderColor;       
+        // draw the container path
+        context.stroke();
+    };
+
+    // fill the container
+    if (this.fill != false) {   // false = "black"
+        context.fillStyle = this.fill;
+        context.fill();
+    };
+
+    this.layout(context);
+
+    // draw the children
+    for (var i = 0; i < this.children.length; i++) {
+        // only draw if the children are visible
+        if (this.children[i].visible == true) {
+            context.save();
+            this.children[i].draw(context);
+            context.restore();
+        };
+    };
+
+    context.restore(); 
 };
 
 Circle.prototype.layout = function(context) {
-    
+    var angle = 2*Math.PI / this.children.length;
+    console.log("angle: "+angle);
+
+    for (var i = 0; i < this.children.length; i++) {
+        if (this.children[i].visible == true) {
+            // place the chilren so that their centers lie positioned at equal angles around a circule perimeter 
+            this.children[i].top = this.layoutCenterY - this.layoutRadius * Math.sin(angle*i) - this.children[i].height/2;
+            this.children[i].left = this.layoutCenterX - this.layoutRadius * Math.cos(angle*i) - this.children[i].width/2; 
+        };
+    }; 
 };
 
 Circle.prototype.getWidth = function(context) {
-    
+    return this.width;
 };
 
 Circle.prototype.getHeight = function(context) {
-    
+    return this.height;
 }
 
 
@@ -609,7 +726,50 @@ OvalClip.inheritsFrom(Container);
 
 //Rest of ovalClip methods here
 OvalClip.prototype.draw = function(context) {
-    
+    console.log(this);
+
+    context.save();
+
+    // apply translation ,rotation, or scale if necessary
+    applyTRS(context, this, this.left, this.top, this.theta, this.scale);
+
+    // create the container path
+    context.beginPath();
+    context.ellipse(this.width/2, this.height/2, this.width/2, this.height/2, 0, 2*Math.PI, 0);
+    context.closePath();
+
+    // set line width and strokeStyle
+    // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
+    // so, only draw the path if the container's borderWidth has a value
+    if (this.borderWidth > 0) {
+        context.lineWidth = this.borderWidth;
+        context.strokeStyle = this.borderColor;       
+        // draw the container path
+        context.stroke();
+    };
+
+    // fill the container
+    if (this.fill != false) {   // false = "black"
+        context.fillStyle = this.fill;
+        context.fill();
+    };
+
+    // make a clip and draw the children in the container
+    context.clip();
+
+    this.layout(context);
+
+    // draw the children
+    for (var i = 0; i < this.children.length; i++) {
+        // only draw if the children are visible
+        if (this.children[i].visible == true) {
+            context.save();
+            this.children[i].draw(context);
+            context.restore();
+        };
+    };
+
+    context.restore();   
 };
 
 OvalClip.prototype.layout = function(context) {
@@ -617,11 +777,11 @@ OvalClip.prototype.layout = function(context) {
 };
 
 OvalClip.prototype.getWidth = function(context) {
-    
+    return this.width;
 };
 
 OvalClip.prototype.getHeight = function(context) {
-    
+    return this.height;
 };
 
 

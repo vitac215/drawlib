@@ -85,6 +85,7 @@ window.onload = function () {
   
     var row = new Row({ 
         width: 400,
+        //width: 130,
 		height: 100,
 		left: 20,
 		top: 20,

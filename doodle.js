@@ -11,7 +11,7 @@ window.onload = function () {
     	height: 768,
     	borderWidth: 0,
     	//fill: "#ffffff",
-    	fill: "#48bfe4"
+    	fill: "#448ccb"
     });
 
     // Column for snow man
@@ -19,7 +19,7 @@ window.onload = function () {
     	width: 500,
     	height: 600,
     	left: 260,
-    	top: 200,
+    	top: 150,
     	borderWidth: 0,
     	borderColor: ""
     });
@@ -29,7 +29,7 @@ window.onload = function () {
     	width: 500,
     	height: 600,
     	left: 260,
-    	top: 200,
+    	top: 150,
     	borderWidth: 0,
     	borderColor: ""
     });
@@ -106,34 +106,85 @@ window.onload = function () {
     	snowman_head.children.push(snowman_eye1, snowman_eye2, snowman_mouth1, snowman_mouth2);
     	column.children.push(snowman_head, snowman_body);
     	container1.children.push(snowman_hand1, snowman_hand2);
+    	background.children.push(column, container1);
+    	root.children.push(background);
     })();
 
-    // Container for snowflakes
-    var snowflake_container = new Circle({
-		width: 100,
-		height: 100,
-		left: 510,
-		top: 400,
-		borderWidth: 0,
-		layoutCenterX: 0,
-		layoutCenterY: 0,
-		layoutRadius: 330   	
+    // Title
+    var text = new Text({
+        top: 20,
+        left: 50,
+        font: "Chalkduster",
+        size: "40",
+        fill: "#ffffff",
+        content: "Snowman"
     });
 
-    // Images of snowflakes
-    for (var i = 0; i < 10; i++) {
-    	var snowflake = new DoodleImage({
-    		src: "images/snowflake_white.png",
-    		width: 80,
-    		height: 80
-    	})
-    	snowflake_container.children.push(snowflake);
+    root.children.push(text);
+
+    // Add effect to the snowflakes
+    function switch_snowflake(){
+	    //context.clearRect(0, 0, canvas.width, canvas.height);
+	    var snowflake_container = new Circle({
+			width: 100,
+			height: 100,
+			left: 510,
+			top: 380,
+			borderWidth: 0,
+			layoutCenterX: 0,
+			layoutCenterY: 0,
+			layoutRadius: 330   	
+	    });
+
+	 //    // On and off
+	    // var onoff = Math.floor(Math.random()*10);
+		// if (onoff%2) {
+		//     for (var i = 0; i < 10; i++) {
+		//     	var snowflake = new DoodleImage({
+		//     		src: "images/snowflake_white.png",
+		//     		width: 80,
+		//     		height: 80
+		//     	})
+		//     	snowflake_container.children.push(snowflake);
+		//     }  
+		// }
+		// else {
+		//     for (var i = 0; i < 10; i++) {
+		//     	var snowflake = new DoodleImage({
+		//     		src: "images/snowflake.png",
+		//     		width: 80,
+		//     		height: 80
+		//     	})
+		//     	snowflake_container.children.push(snowflake);
+		//     }   
+		// }
+
+		// Twinkle
+	    for (var i = 0; i < 10; i++) {
+	    	var twinkle = Math.floor(Math.random()*10);
+	    	if (twinkle>3) {
+		    	var snowflake = new DoodleImage({
+		    		src: "images/snowflake_white.png",
+		    		width: 80,
+		    		height: 80
+		    	})
+	    	}
+	    	else {
+		    	var snowflake = new DoodleImage({
+		    		src: "images/snowflake.png",
+		    		width: 80,
+		    		height: 80
+		    	})
+		    }
+	    	snowflake_container.children.push(snowflake);
+	    }  
+	    
+	    // Draw
+	    root.children.push(snowflake_container);
+	    root.draw();
     }
 
-    background.children.push(column, container1)
-
-    // Draw
-    root.children = [background, snowflake_container];
-    root.draw();
+    switch_snowflake();
+    setInterval(switch_snowflake, 200);
 
  };

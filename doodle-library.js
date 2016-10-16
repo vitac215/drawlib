@@ -1,7 +1,7 @@
 // Things to check:
 //   text    fillText(last param)
 //   rect    context.beginpath()
-//   img     context.save()
+//   layour??
 
 /* Doodle Drawing Library
  *
@@ -21,18 +21,30 @@ function Doodle (context) {
     this.children = [];
 }
 
+var images = 0;
+var imagesLoad = 0;
+
 Doodle.prototype.draw = function() {
- 	// draw all children
-    for (var i = 0; i < this.children.length; i++) {
-        console.log("children: "+this.children[i]);
-        // only draw if the children are visible
-        if (this.children[i].visible == true) {
-            this.context.save();
-            this.children[i].draw(this.context);
-            this.context.restore();
-        };
-    };
-    return;
+    var self = this;
+    // check if all images are loaded
+    if (images == imagesLoad) {
+        // draw all children
+        for (var i = 0; i < this.children.length; i++) {
+            // only draw if the children are visible
+            if (this.children[i].visible == true) {
+                this.context.save();
+                this.children[i].draw(this.context);
+                this.context.restore();
+            }
+        }
+    }
+    else {
+        setTimeout(function(){
+            // try drawing again
+            self.draw(self.context);    // why this.draw() doesn't work
+        }, 100);
+    }
+
 };
 
 
@@ -137,7 +149,8 @@ Text.prototype.draw = function(context) {
         context.font = this.size+"pt "+this.font;
     }
     context.fillStyle = this.fill; 
-    context.fillText(this.content, 0, 0);
+    context.fillText(this.content, 0, this.getHeight());
+    console.log("height of text: "+this.getHeight());
     context.closePath();
 
     console.log(this);  
@@ -168,39 +181,37 @@ function DoodleImage(attrs) {
     this.width = attrs.width;
     this.height = attrs.height;
     this.src = attrs.src;
+    this.img = new Image();
+    this.img.src = this.src;
+
+    // load all images before the whole drawing
+    images++;
+    // imagesLoad add 1 when a image is loaded
+    this.img.onload = function() {
+        imagesLoad++;
+    }
+
 };
 DoodleImage.inheritsFrom(Drawable);
 
 //DoodleImage methods here
 DoodleImage.prototype.draw = function(context) {
-    console.log(this); 
-    // create a new image object
-    var img = new Image();
-    img.src = this.src;
-    img.left = this.left;
-    img.top = this.top;
-    img.theta = this.theta;
-    img.scale = this.scale;
-    img.width = this.width;
-    img.height = this.height;
 
     // make sure the image is loaded before drawing
-    img.onload = function() {
-        context.save();  //  question: why this is needed ... already call that in drawable.draw
-        // apply translation ,rotation, or scale if necessary
-        applyTRS(context, img, img.left, img.top, img.theta, img.scale); 
+    context.save();  
+    // apply translation ,rotation, or scale if necessary 
+    applyTRS(context, this, this.left, this.top, this.theta, this.scale); 
 
-        context.beginPath();
-        // If the width and height of the image are not specified (i.e. default to -1)
-        if (img.width == -1 && img.height == -1) {
-            context.drawImage(img, 0, 0);
-        }
-        else {
-            context.drawImage(img, 0, 0, img.width, img.height);   
-        }
-        context.closePath();   
-        context.restore();
-    };
+    context.beginPath();
+    // If the width and height of the image are not specified (i.e. default to -1)
+    if (this.width == -1 && this.height == -1) {
+        context.drawImage(this.img, 0, 0);
+    }
+    else {
+        context.drawImage(this.img, 0, 0, this.width, this.height);   
+    }
+    context.closePath();   
+    context.restore();
 };
 
 DoodleImage.prototype.getWidth = function(context) {
@@ -284,10 +295,12 @@ Rectangle.prototype.draw = function(context) {
     context.beginPath();   // question: weird thing happens if this is commented out
     context.rect(this.x, this.y, this.width, this.height);
     // set line width and strokeStyle
-    context.lineWidth = this.lineWidth;
-    context.strokeStyle = this.color;
-    // draw the rectangle
-    context.stroke();
+    if (this.lineWidth){
+        context.lineWidth = this.lineWidth;
+        context.strokeStyle = this.color;
+        // draw the rectangle
+        context.stroke();
+    }
     context.closePath(); 
 
     console.log(this);
@@ -314,24 +327,73 @@ function Container(attrs) {
     attrs = mergeWithDefault(attrs, dflt);
     Drawable.call(this, attrs);    
     //Rest of constructor code here
+    this.children = [];
+    this.width = attrs.width;
+    this.height = attrs.height;
+    this.fill = attrs.fill;
+    this.borderColor = attrs.borderColor;
+    this.borderWidth = attrs.borderWidth;
 };
 Container.inheritsFrom(Drawable);
 
 //Rest of container methods here
 Container.prototype.draw = function(context) {
-    
+    console.log(this);
+
+    context.save();
+
+    // apply translation ,rotation, or scale if necessary
+    applyTRS(context, this, this.left, this.top, this.theta, this.scale);
+
+    // create the container path
+    context.beginPath();
+    context.rect(0, 0, this.width, this.height);
+    context.closePath();
+
+    // set line width and strokeStyle
+    // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
+    // so, only draw the path if the container's borderWidth has a value
+    if (this.borderWidth) {
+        context.lineWidth = this.borderWidth;
+        context.strokeStyle = this.borderColor;       
+        // draw the container path
+        context.stroke();
+    };
+
+    // fill the container
+    if (this.fill != false) {   // false = "black"
+        context.fillStyle = this.fill;
+        context.fill();
+    };
+
+    // make a clip and draw the children in the container
+    context.clip();
+
+    this.layout(context);
+
+    // draw the children
+    for (var i = 0; i < this.children.length; i++) {
+        // only draw if the children are visible
+        if (this.children[i].visible == true) {
+            context.save();
+            this.children[i].draw(context);
+            context.restore();
+        };
+    };
+
+    context.restore();
 };
 
 Container.prototype.layout = function(context) {
-    
+    // no change to the children's layout
 };
 
 Container.prototype.getWidth = function(context) {
-    
+    return this.width;
 };
 
 Container.prototype.getHeight = function(context) {
-    
+    return this.height;
 };
 
 
@@ -344,19 +406,69 @@ Pile.inheritsFrom(Container);
 
 //Rest of pile methods here
 Pile.prototype.draw = function(context) {
-    
+    console.log(this);
+
+    context.save();
+
+    // apply translation ,rotation, or scale if necessary
+    applyTRS(context, this, this.left, this.top, this.theta, this.scale);
+
+    // create the container path
+    context.beginPath();
+    context.rect(0, 0, this.width, this.height);
+    context.closePath();
+
+    // set line width and strokeStyle
+    // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
+    // so, only draw the path if the container's borderWidth has a value
+    if (this.borderWidth) {
+        context.lineWidth = this.borderWidth;
+        context.strokeStyle = this.borderColor;       
+        // draw the container path
+        context.stroke();
+    };
+
+    // fill the container
+    if (this.fill != false) {   // false = "black"
+        context.fillStyle = this.fill;
+        context.fill();
+    };
+
+    // make a clip and draw the children in the container
+    context.clip();
+
+    this.layout(context);
+
+    // draw the children
+    for (var i = 0; i < this.children.length; i++) {
+        // only draw if the children are visible
+        if (this.children[i].visible == true) {
+            context.save();
+            this.children[i].draw(context);
+            context.restore();
+        };
+    };
+
+    context.restore();
 };
 
 Pile.prototype.layout = function(context) {
-    
+    // place all the children at its own top-left corner
+    for (var i = 0; i < this.children.length; i++) {
+        // only draw if the children are visible
+        if (this.children[i].visible == true) {
+            this.children[i].top = 0;
+            this.children[i].left = 0;
+        };
+    };
 };
 
 Pile.prototype.getWidth = function(context) {
-    
+    return this.width;
 };
 
 Pile.prototype.getHeight = function(context) {
-    
+    return this.height;
 };
 
 
@@ -370,19 +482,65 @@ Row.inheritsFrom(Container);
 
 //Rest of row methods here
 Row.prototype.draw = function(context) {
-    
+    console.log(this);
+
+    context.save();
+
+    // apply translation ,rotation, or scale if necessary
+    applyTRS(context, this, this.left, this.top, this.theta, this.scale);
+
+    // create the container path
+    context.beginPath();
+    context.rect(0, 0, this.width, this.height);
+    context.closePath();
+
+    // set line width and strokeStyle
+    // Cautious: when strokeStyle has a value or stroke() is called, lineWidth is default to 1
+    // so, only draw the path if the container's borderWidth has a value
+    if (this.borderWidth) {
+        context.lineWidth = this.borderWidth;
+        context.strokeStyle = this.borderColor;       
+        // draw the container path
+        context.stroke();
+    };
+
+    // fill the container
+    if (this.fill != false) {   // false = "black"
+        context.fillStyle = this.fill;
+        context.fill();
+    };
+
+    // make a clip and draw the children in the container
+    context.clip();
+
+    this.layout(context);
+
+    // draw the children
+    for (var i = 0; i < this.children.length; i++) {
+        // only draw if the children are visible
+        if (this.children[i].visible == true) {
+            context.save();
+            this.children[i].draw(context);
+            context.restore();
+        };
+    };
+
+    context.restore();   
 };
 
 Row.prototype.layout = function(context) {
-    
+    // place all the children in a single horizontal row with the children vertically centered
+    var center = this.getHeight()/2;
+    console.log("center: "+center);
+
 };
 
 Row.prototype.getWidth = function(context) {
-    
+    return this.width;
 };
 
 Row.prototype.getHeight = function(context) {
-    
+    return this.height;
 };
 
 

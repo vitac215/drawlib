@@ -1,14 +1,4 @@
-// Things to check:
-//   rect    context.beginpath()
-
 /* Doodle Drawing Library
- *
- * Drawable and Primitive are base classes and have been implemented for you.
- * Do not modify them! 
- *
- * Stubs have been added to indicate where you need to complete the
- * implementation.
- * Please email me if you find any errors!
  */
 
 /*
@@ -40,7 +30,7 @@ Doodle.prototype.draw = function() {
     else {
         setTimeout(function(){
             // Try drawing again
-            doodle.draw(doodle.context);    // question: why this.draw() doesn't work
+            doodle.draw(doodle.context);    
         }, 200);
     }
 
@@ -259,8 +249,6 @@ Line.prototype.draw = function(context) {
     context.lineTo(this.endX, this.endY);
     context.stroke();
     context.closePath(); 
-
-    //console.log(this); 
 };
 
 Line.prototype.getWidth = function(context) {
@@ -345,8 +333,6 @@ Container.inheritsFrom(Drawable);
 
 //Rest of container methods here
 Container.prototype.draw = function(context) {
-    //console.log(this);
-
     context.save();
 
     // Apply translation ,rotation, or scale if necessary
@@ -416,8 +402,6 @@ Pile.inheritsFrom(Container);
 
 //Rest of pile methods here
 Pile.prototype.draw = function(context) {
-    //console.log(this);
-
     context.save();
 
     // Apply translation ,rotation, or scale if necessary
@@ -494,8 +478,6 @@ Row.inheritsFrom(Container);
 
 //Rest of row methods here
 Row.prototype.draw = function(context) {
-    //console.log(this);
-
     context.save();
 
     // Apply translation ,rotation, or scale if necessary
@@ -550,7 +532,6 @@ Row.prototype.layout = function(context) {
 
     for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].visible == true) {
-            //console.log("left: "+left);
             // Make the child vertically centered
             this.children[i].top = center - this.children[i].getHeight()/2;
             // Place the child in a single horizontal row
@@ -635,7 +616,6 @@ Column.prototype.layout = function(context) {
 
     for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].visible == true) {
-            //console.log("top: "+top);
             // Make the child vertically centered
             this.children[i].left = center - this.children[i].getWidth()/2;
             // Place the child in a single horizontal row
@@ -675,8 +655,6 @@ Circle.inheritsFrom(Container);
 
 //Rest of circle methods here
 Circle.prototype.draw = function(context) {
-    //console.log(this);
-
     context.save();
 
     // Apply translation ,rotation, or scale if necessary
@@ -720,7 +698,6 @@ Circle.prototype.draw = function(context) {
 
 Circle.prototype.layout = function(context) {
     var angle = 2*Math.PI / this.children.length;
-    //console.log("angle: "+angle);
 
     for (var i = 0; i < this.children.length; i++) {
         if (this.children[i].visible == true) {
@@ -752,8 +729,6 @@ OvalClip.inheritsFrom(Container);
 
 //Rest of ovalClip methods here
 OvalClip.prototype.draw = function(context) {
-    //console.log(this);
-
     context.save();
 
     // Apply translation ,rotation, or scale if necessary

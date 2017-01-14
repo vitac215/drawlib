@@ -124,7 +124,6 @@ window.onload = function () {
 
     // Add effect to the snowflakes
     function switch_snowflake(){
-	    //context.clearRect(0, 0, canvas.width, canvas.height);
 	    var snowflake_container = new Circle({
 			width: 100,
 			height: 100,
@@ -135,29 +134,6 @@ window.onload = function () {
 			layoutCenterY: 0,
 			layoutRadius: 330   	
 	    });
-
-	 //    // On and off
-	    // var onoff = Math.floor(Math.random()*10);
-		// if (onoff%2) {
-		//     for (var i = 0; i < 10; i++) {
-		//     	var snowflake = new DoodleImage({
-		//     		src: "images/snowflake_white.png",
-		//     		width: 80,
-		//     		height: 80
-		//     	})
-		//     	snowflake_container.children.push(snowflake);
-		//     }  
-		// }
-		// else {
-		//     for (var i = 0; i < 10; i++) {
-		//     	var snowflake = new DoodleImage({
-		//     		src: "images/snowflake.png",
-		//     		width: 80,
-		//     		height: 80
-		//     	})
-		//     	snowflake_container.children.push(snowflake);
-		//     }   
-		// }
 
 		// Twinkle
 	    for (var i = 0; i < 10; i++) {
